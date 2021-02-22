@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  mongo1:
+    image: mongo
+    container_name: mongo1
+    command: ["--replSet", "rs0", "--dbpath", "/data/db", "--bind_ip_all"]
+    volumes:
+      - ./mongo/data1/db:/data/db 
+      - ./mongo/data1/configdb:/data/configdb
+    networks: 
+      - database
+
+  mongo2:
+    image: mongo
+    container_name: mongo2
+    command: ["--replSet", "rs0", "--dbpath", "/data/db", "--bind_ip_all"]
+    volumes:
+      - ./mongo/data2/db:/data/db 
+      - ./mongo/data2/configdb:/data/configdb
+    networks: 
+      - database
+
+  mongo3:
+    image: mongo
+    container_name: mongo3
+    command: ["--replSet", "rs0", "--dbpath", "/data/db", "--bind_ip_all"]
+    volumes:
+      - ./mongo/data3/db:/data/db 
+      - ./mongo/data3/configdb:/data/configdb
+    networks: 
+      - database
+
+  mongo-config:
+    image: mongo
+    networks: 
+      - database
+    depends_on: 
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ['/scripts/mongo-setup.sh']
+
+networks:
+  database:
+    driver: bridge
